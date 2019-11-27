@@ -2,7 +2,7 @@ import time
 import redis
 from app import app
 from app.forms import LoginForm
-from flask import render_template
+from flask import render_template, redirect, flash, url_for
 
 cache = redis.Redis(host='redis', port=6379)
 
@@ -17,10 +17,14 @@ def get_hit_count():
             retries -= 1
             time.sleep(0.5)
 
-
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(form.username.data, form.remember_me.data))
+    
+        return redirect('/index')
+    
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/')

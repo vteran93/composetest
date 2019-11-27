@@ -1,0 +1,22 @@
+<html>
+    <head>
+        {% if title %}
+        <title> {{ title }} - Microblog</title>
+        {% else %}
+        <title> Welcome - Microblog</title>
+        {% endif %}
+        
+    </head>
+    <body>
+        Template
+        <h1> Hello! This page has been visit {{times}} times.</h1>
+        {% for post in posts %}
+            <div>
+                <h2>{{post.author.username}}</2>
+                    <p>
+                        {{post.body}}
+                    </p>
+            </div>
+        {% endfor %}
+    </body>
+</html>

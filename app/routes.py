@@ -1,9 +1,9 @@
 import time
 import redis
-from app import app
+from app import app, db
 from app.models import User
-from app.forms import LoginForm
-from flask_login import current_user, login_user, logout_user
+from app.forms import LoginForm, RegistrationForm
+from flask_login import current_user, login_user, logout_user, login_required
 from flask import render_template, redirect, flash, url_for
 
 cache = redis.Redis(host='redis', port=6379)
@@ -44,6 +44,7 @@ def logout():
 
 @app.route('/')
 @app.route('/index')
+@login_required
 def hello():
     user = {'username': 'Miguel'}
     count = get_hit_count()
@@ -61,3 +62,20 @@ def hello():
     ]
 
     return render_template('index.html', title='Home', user=user, times=count, posts=posts)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulation, you are now a registered user!')
+
+        return redirect(url_for('index'))
+    
+    return render_template('register.html', title='Register', form=form)

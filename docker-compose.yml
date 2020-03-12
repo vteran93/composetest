@@ -7,6 +7,8 @@ services:
     volumes:
       - .:/code
     environment:
-      FLASK_ENV: development
+      FLASK_ENV: production
+    env_file: 
+      - ./.env.dev
   redis:
     image: "redis:alpine"
